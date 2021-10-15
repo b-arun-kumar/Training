@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="scripts/indexdb.js"></script>
+    <script>
+
+        function loadContacts(){
+
+            var tx = db.transaction(["Contacts"], "readonly");
+            var objectStore = tx.objectStore("Contacts");
+            var request = objectStore.openCursor();
+
+            var tbody = document.getElementById("tbody");
+            request.onsuccess = function(evt){
+
+                var cursor = evt.target.result;
+                if(cursor){
+                    //console.log("cursor", cursor);
+
+                    var tr = document.createElement("tr");
+                    
+                    var idTd = document.createElement("td");
+                    var idText = document.createTextNode(cursor.value.id);
+                    idTd.appendChild(idText);
+                    tr.appendChild(idTd);
+
+                    var nameTd = document.createElement("td");
+                    var nameText = document.createTextNode(cursor.value.name);
+                    nameTd.appendChild(nameText);
+                    tr.appendChild(nameTd);
+
+                    var emailTd = document.createElement("td");
+                    var emailText = document.createTextNode(cursor.value.email);
+                    emailTd.appendChild(emailText);
+                    tr.appendChild(emailTd);
+
+                    tbody.appendChild(tr);
+
+                    cursor.continue();
+                }
+                
+            }
+        }
+
+        function save(){
+          
+            var contact = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            }
+
+            //open a transaction
+            var tx = db.transaction(["Contacts"], "readwrite");
+            var objectStore = tx.objectStore("Contacts");
+            var req = objectStore.add(contact);
+            req.onsuccess = function(){
+                alert("Saved");
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("password").value = "";
+
+            }
+            req.onerror = function(){
+                
+            }
+
+        }
+    </script>
+</head>
+<body onload="loadContacts();">
+    <header>
+        <h2>Contacts</h2>
+    </header>
+    <main>
+
+        <form>
+            <fieldset>
+                <div>
+                    <p><label for="name">Name</label></p>
+                    <input id="name" placeholder="Name" required minlength="3" autofocus/>
+                    <span style="display: none;" id="nameMessage">Invalid Value</span>
+                </div>
+                
+                <div>
+                    <p><label for="email">Email</label></p>
+                    <input id="email" type="email" placeholder="Email" required/>
+                </div>
+                
+                <div>
+                    <p><label for="password">Password</label></p>
+                    <input id="password" type="password" placeholder="Password" pattern="[a-zA-Z]{4,}"/>
+                </div>
+                <br/>
+                <div>
+                    <button type="button" onclick="save()">Save</button>
+                </div>
+            </fieldset>
+        </form>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <!-- <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr> -->
+            </tbody>
+        </table>
+    </main>
+
+
+</body>
+</html>

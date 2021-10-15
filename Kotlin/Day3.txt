@@ -1,0 +1,164 @@
+Lab 9 - Modify same application for Async using co-routines
+		suspend fun getData():String{
+		
+	How to invoke 
+		
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                val useroutput = userprocessor.create(UserInput(name, job));
+                println("in post ${useroutput.createdAt} with ${useroutput.name}")
+                findViewById<TextView>(R.id.textview_first).setText("Created with "+ useroutput.id)
+            }
+        }
+
+Lab 8 - Invoking remote call from btnclick
+	Create Helper 
+		getData():String{
+			// lab to connect reqres.in
+			return name
+		}
+	change buttonhandler code 
+		to invoke getData from helper
+	-------> Observe error
+
+Lab 7 - 
+	modify first_fragment.xml 
+		to create a button - button1
+		change button to copy all app properties
+		arragen textview, button1, Nextbutton
+		modify button to have   
+			android:onClick="button1handler"
+		add buttonhandler code in activity 
+			modify content of textview
+			
+	fun button1handler(view: View) {
+    	    	println("button1handler invoked ")
+        	val textview1: TextView = findViewById<TextView>(R.id.textview_first)
+        	textview1.setText("Hello World !!")
+    }
+    
+------------------------------
+Lab 6 - new project -> base activity
+		Run app
+1. AndroidManifest
+	Langing page/first activity (package.name)
+2. Checking that first Activity 
+	kt
+	
+3. xml (res/layout)
+	activity_main.xml
+	content_main.xml
+---------- What is fragment/activity/binding	
+	
+
+-----------------------
+Lab 5 - Getting and parsing info (json)
+	Build.gradle(Project)
+		add
+		     classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
+
+	Build.gradle(module / app)
+		register plugin
+			id 'kotlinx-serialization'
+		add
+		implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1'
+		implementation 'org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0'
+	
+	Lab2.kt
+		package demo.reqres
+
+		import kotlinx.serialization.Serializable
+		import kotlinx.serialization.decodeFromString
+		import kotlinx.serialization.encodeToString
+		import kotlinx.serialization.json.Json
+		import java.net.URL
+		import kotlinx.serialization.json.JsonConfiguration
+		import java.io.BufferedReader
+		import java.io.InputStreamReader
+
+		@Serializable
+		data class Info(val data:User1,val support:Support)
+		@Serializable
+		data class Support(val url:String,val text:String)
+		@Serializable
+		data class User1(val id:Int,val email:String,val first_name:String,val last_name:String,val avatar:String)
+		fun main() {
+			val myURL = URL("https://reqres.in/api/users/2")
+			val httpcon = myURL.openConnection()
+		 /*   httpcon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+			httpcon.setRequestProperty("Content-Language", "en-US")
+			httpcon.setRequestProperty("user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36")
+			*/
+			val inps = InputStreamReader(httpcon.getInputStream())
+			val buff = BufferedReader(inps)
+			var str= ""
+			var line: String?
+			do {
+				line = buff.readLine()
+				str+= line?:""
+			} while (line != null)
+			println("Server returned $str")
+
+			val obj = Json.decodeFromString<Info>("""
+				$str
+			""")
+			println("Object decoded from str" + obj)
+
+			println("First name of that object " +obj.data.first_name)
+		}
+----------------------	
+Lab 4 - Getting remote information
+	package and.demo.democoroutines
+
+	import java.net.URL
+
+	fun main() {
+		var url = URL("https://jsonplaceholder.typicode.com/todos/1");
+		url.openConnection().setRequestProperty("Accept", "application/json");
+		val entireJson = url.readText()
+		println(entireJson);
+	}
+
+app gradle file ->     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0"
+	      implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0"
+
+Lab 3 - accept input from user and see impact on execution
+Lab 1 - 
+	import kotlinx.coroutines.delay
+	import kotlinx.coroutines.launch
+	import kotlinx.coroutines.runBlocking
+
+	fun main() = runBlocking()
+	{ 
+		println("starting of main")
+		// this: CoroutineScope
+		launch { // launch a new coroutine and continue
+			println("start of launch")
+			delay(1000L) // non-blocking delay for 1 second (default time unit is ms)
+			println("World!") // print after delay
+		}
+		println("Hello") // main coroutine continues while a previous one is delayed
+	}
+Lab 2 - 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
+fun main() = runBlocking()
+{ 
+    println("starting of main")
+    // this: CoroutineScope
+    launch { // launch a new coroutine and continue
+        println("\n\nstart of launch1")
+        for ( i in (1..5000))
+        	print("l1- $i")
+        println("\n\nend of launch1")
+    }
+    launch { // launch a new coroutine and continue
+        println("\n\nstart of launch2")
+        for ( i in (1..5))
+        	print("l2- $i")
+        println("\n\nend of launch2")
+    }
+    println("Hello") // main coroutine continues while a previous one is delayed
+}

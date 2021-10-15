@@ -1,0 +1,180 @@
+Lab 7 - implementation by delegation
+	interface Base {
+	    fun print()
+	}
+	 class BaseImpl(val x: Int) : Base {
+	    override fun print() { println("BaseImpl "+ x) }
+	}
+
+	class Derived (obj:Base): Base by obj
+	{
+
+	}
+	//class Derived(b: Base) : Base by b
+	fun main() {
+	    val base = BaseImpl(5)
+	    val d = Derived(base)
+	    d.print()
+	}
+----------------------------
+Lab 6 - 
+	Storing of data in different format
+	interface Store {
+		writetoJSON()
+		writetoXML()
+	}
+	Write two classes 
+		Person(pid, pname)
+		Emp(empno,ename,salary)
+		Current content of person/emp should be written in jsonformat / xml format
+		
+interface Connection {
+    fun open()
+    fun close() 
+    fun getVersion():String{
+        return "V1.0"
+    }
+}
+class MySQL:Connection{
+    override fun getVersion():String{
+        return "V2.0"
+    }
+   override fun open(){
+        println("MySQL open invoked ") 
+     }
+    fun opencon(){
+        println("MySQL opencon invoked ")
+    }
+   override fun close(){
+        println("MySQL close invoked ")
+    }
+}
+
+class Oracle:Connection{
+   override fun open(){
+        println("Oracle open invoked ") 
+     }
+   override fun close(){
+        println("Oracle close invoked ")
+    }
+    fun opencontoora(){
+        println("Oracle opencon invoked ")
+    }
+}
+fun main(args: Array<String>) {
+    val param="Oracle"
+    var db:Connection = if (param=="Oracle") Oracle() else MySQL()
+    db.open()
+    db.close()
+  println(db.getVersion())
+    
+}
+-------------------------------
+Lab 5 - class A {
+    lateinit var x: String
+    var y:String = "HaveSomeInitialValue"
+}
+
+fun main(args: Array<String>) {
+
+    var a = A()
+    a.x = "ExternalInitialization"
+    println("X = ${a.x} , Y = ${a.y}")
+    a.x = "Hello Kotlin"
+    
+}
+Lab 4 - A class called emp
+
+	class Person ( firstName: String) { 
+ 	 var fn:String="a"
+    	init{
+        	fn = firstName
+	        println("in init block " + firstName)
+    	}
+	}
+	
+	Write primary constructor (empno, ename, salary) for initializing variables and give a print method to print all the details
+	Write secondary constructor (empno, ename, salary) for initializing 
+		convert ename to uppercase
+		salary should be between 10 and 100, if passed some thing else just initialize to zero
+
+/*
+class Emp(private var empno:Int, var ename:String, var salary:Double){
+    init{
+    	this.ename = ename.uppercase() 
+        this.salary = if ((10.0..100.0).contains(salary)) salary else 0.0
+   }
+   public fun print(){
+        println("Empno  = $empno, Ename = $ename , Salary = $salary " )
+    }
+}
+	
+fun main(){
+    var e = Emp(10,"Alok",180.10)
+    e.print()
+    //println(e)
+}
+*/
+
+----------------------------------------
+Lab 3 - 
+	Normal If fun maxOf(a: Int, b: Int): Int {
+		    if (a > b) {
+			return a
+		    } else {
+			return b
+		    } }
+	If Expression
+		fun maxOf(a: Int, b: Int) = if (a > b) a else b
+		
+	when (x) {
+ 	   1 -> print("x == 1")
+	    2 -> print("x == 2")
+	    else -> { // Note the block
+		print("x is neither 1 nor 2")
+	    }
+	}
+	val array = Array(6) {i-> i*2} //or 
+	val array = Array(6,{i-> i*2})
+	arrayOf("India","USA","China","Australia","Sri Lanka")
+	//val array = Array(6) {i-> i*2} //or 
+	Write code to initialize array like 10,20,30,40 etc
+	Write code to initialize array with "str1", str2, str3
+	
+	Write a code to initialize array with static numbers like 10,50,660,300
+	//when
+	Print details about each number -> "in range of 1..10", "in range of 11..20" , else "big number"
+	//null safety -> try to say var name = null, println(name.length)
+		var name:String?="ABC"
+		println(name?.length)
+		println(name!!.length)
+	    name = null
+	    println(name?.length)
+	    name!!
+-----------------------------------
+Lab 2- 
+  var a  =  1
+    val s1 = "a is $a" => a is 1
+    a  = 2
+    val s2 = "${s1.replace("is", "was")}, but now is $a"
+				"a is 1".replace("is", "was"), but now is 2
+				a was 1, 
+  
+  Check the difference between var and val
+  Check val with deferred initialization
+  Check Template
+    Simple Expression
+    Arbitrary Expression
+-----------------------------------
+Lab 1 - https://play.kotlinlang.org/
+  Create a test function
+    1. Explicit 
+        fun sum(a: Int, b: Int): Int {
+          return a+b
+         }
+    2. Implicit return type / Single liner
+        fun sum(a: Int, b: Int) = a + b	
+    3. In explicit function delete return type and check
+    
+
+

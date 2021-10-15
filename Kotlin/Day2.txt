@@ -1,0 +1,250 @@
+----------------------
+package com.finaldemo.demo2.dbcon
+
+import com.mongodb.client.MongoClient
+import org.litote.kmongo.*
+
+data class Emp(val empno: Int, val ename:String,val salary:Double);
+
+class MongoCRUDRepo {
+    fun createclient(): MongoClient {
+
+      //  val constr=  "mongodb+srv://dbuser:mypassword@mycluster.exzwx.mongodb.net/mycluster?retryWrites=true&w=majority"
+      val constr=  "mongodb+srv://dbuser11:9DeA7H3NV0taVwEW@mycluster.exzwx.mongodb.net/mycluster?retryWrites=true&w=majority"
+      return KMongo.createClient(constr);
+    }
+
+    fun create(emp: Emp) {
+        println("Create " +emp)
+        val client =createclient();
+        val database = client.getDatabase("db")
+        val col = database.getCollection<Emp>()
+        col.insertOne(emp)
+        client.close()
+    }
+
+    fun list(){
+        println("List")
+        val client =createclient();
+        val database = client.getDatabase("db")
+        val col = database.getCollection<Emp>()
+        for (emp in col.find())
+            println(emp)
+        client.close()
+    }
+
+    fun delete(empno:Int){
+        println("delete")
+        val client =createclient();
+        val database = client.getDatabase("db")
+        val col = database.getCollection<Emp>()
+        col.deleteOne("{'empno':$empno}")
+        client.close()
+    }
+}
+fun main(){
+  val repo = MongoCRUDRepo()
+    val i = 1
+    val e = Emp(i, "Name$i", i * 1000.0)
+        repo.create(e)
+    repo.list()
+    repo.delete(1)
+    repo.list()
+}
+----------------------
+Lab 
+	Modify gradle(app) add
+		implementation("org.litote.kmongo:kmongo:4.2.8")
+	
+	Write Code to insert
+	
+data class Emp(val empno: Int, val ename:String,val salary:Double);
+
+class MongoCRUDRepo {
+
+    fun create(emp: Emp) {
+        val client = KMongo.createClient("mongodb+srv://dbuser:mypassword@mycluster-shard-00-01.exzwx.mongodb.net:27017/db?retryWrites=true&w=majority")
+        println("client =" + client)
+        val database = client.getDatabase("db")
+
+        println("after database " +database)
+        //val col = database.getCollection<Emp>("emp")
+        //col.insertOne(emp)
+    }
+}
+fun main(){
+  val repo = MongoCRUDRepo()
+    val i = 1
+    val e = Emp(i, "Name$i", i * 1000.0)
+    repo.create(e)
+}
+
+	 	
+---------------
+Lab 6 - 
+	Modify gradle(app) add
+	 implementation 'mysql:mysql-connector-java:8.0.23'
+	 
+	 
+	Connection settings
+		MySQL Configuration
+		Host  - database-1.chidkemxak9r.us-east-1.rds.amazonaws.com
+		Port - 3306
+		user - admin
+		password - mypassword
+		
+		//create table dept (deptno integer, dname varchar(20), loc varchar(20))
+		
+	modify my project to include MySQL Library
+		modify build.gradle (??.app)
+			  implementation 'mysql:mysql-connector-java:8.0.23'
+		sync now
+	
+	
+	Modify Code
+		1. Create/list -> try-catch
+		2. Write update and delete
+			
+	
+	
+		package com.finaldemo.demo2.dbcon
+
+		import java.sql.Connection
+		import java.sql.DriverManager
+
+		data class Dept (var deptno: Int = 0, var dname: String = "", var loc: String = "") {}
+
+		class DbOperations{
+
+
+		    fun open(url:String="jdbc:mysql://database-1.chidkemxak9r.us-east-1.rds.amazonaws.com:3306/test",
+			     uname:String="admin",
+			     pwd:String="mypassword"
+			     ): Connection {
+			  return DriverManager.getConnection(url,uname,pwd)
+		    }
+		    fun create(d:Dept){
+			// con.close -> finally
+			val con = open()
+			val sql = "insert into dept values ( ${d.deptno}, '${d.dname}', '${d.loc}' )"
+			println("in create - $sql")
+			val stmt = con.createStatement()
+			stmt.execute(sql)
+			con.close()
+		    }
+		    fun list(){
+			val con = open()
+			val sql = "select * from dept"
+			val stmt = con.createStatement()
+			val rs = stmt.executeQuery(sql)
+
+			while(rs.next()) {
+			    println("Deptno : ${rs.getInt(1)}, DName :  ${rs.getString(2)}, Loc : ${rs.getString(3)} ")
+			}
+			con.close()
+		    }
+		}
+		fun main(){
+		    val d = Dept(10,"Vaishali",loc = "Pune")
+		    val dbops = DbOperations()
+		    //dbops.create(d)
+		    dbops.list()
+		}
+		/*
+		fun list(){
+		    //Print
+		}
+		fun delete(deptno:Int){
+
+		}
+		fun update(d:Dept){
+
+		}
+		*/
+
+
+----------------------
+Lab 4 - 
+	accept two number from user and show sum and division
+		numberformat /  divide by zero
+Exception handling
+package com.finaldemo.demo2
+
+fun main(args: Array<String>) {
+    try {
+        print("Enter your name :")
+        val name = readLine()
+        print("Enter your age :")
+
+        var age: Int = Integer.valueOf(readLine())
+        println("Your name is $name and your age is $age")
+    }catch (e: Exception)
+    {
+        println("Some Error " + e.message)
+    }
+    finally {
+        println("finally - Message for try or catch both")
+    }
+}
+----------------
+Lab 3 - Show only records where number of characters is name are more than 5
+		or deptno > 2 and < 5
+	package com.finaldemo.demo2
+
+	data class Department (var no: Int = 0, var name: String = "", var loc: String = "") {}
+
+	class DeptManager {
+	    var depts:MutableList<Department> = mutableListOf()
+	    fun add(dept: Department) {
+		depts.add(dept)
+	    }
+	}
+	fun DeptManager.print(){
+	    for (d in this.depts)
+		println(d)
+	}
+	fun main() {
+	    val manager = DeptManager()
+	    for (i in 0..4){
+		val d = Department(i+1, "AAA"+i, if ( i % 2 ==0) "Hyd" else "Pune")
+		manager.add(d)
+	    }
+	    manager.print()
+	    println("-------------------From Hyd-----------------")
+	    manager.depts.filter { d-> if (d.loc=="Hyd") true else false }.forEach{d1->println(d1)}
+
+	}
+
+------------------------------
+Lab 1  - Android studio
+	New Project -> no activity
+		API 26 (any api )
+	
+Lab 2  - Write code for two classes
+	Data class Dept -> deptno, dname, loc
+	Class DeptManager
+	{
+		Array of Dept (5)
+		count 
+		fun add(Dept){ replace param in array  Arry[count]  = dept}
+	}
+	add print functionality using decorator
+		print ( all items)
+	main()
+		create DeptMangaer
+		while / for => invokde add with 5 different dept
+		print
+	
+	----------
+		    val s:String  = "aaa"
+		    println(s)
+		    s.shout()
+		}
+		fun String.shout():String{
+		    println("shout invoked ...")
+		    return this.uppercase();
+		 }
+	data class Emp (var empno:Int,var ename:String) {
+    		
+	}
+

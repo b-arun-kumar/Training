@@ -1,0 +1,56 @@
+day 1
+only one window in a qml.
+
+day 2
+property binding loop - cyclic loop - to be avoided
+property bindings can be costly - if evaluation is complex/large it might consume time
+anchors take precedence over x,y & height,width
+if cells in grid overflow the allocated cell count, the leftover cells shall be placed at the default locations
+mouse event - x,y is wrt to the object in context
+x,y is always wrt to parent
+constructor equivalent = Component.onCompleted
+qml functions adhere to javascript syntax
+
+day 3
+
+day 4
+
+day 5
+qml components creation:
+	existing qml components
+	expose c++ class components
+first letter of qml file should always be upper case
+qml component name is name of qml file
+qml files dont communicate with each other
+qml components communicate with each other
+a.exec() starts the event loop
+Q appl / Q GUI appl / Q Core appl collects system information - MAC or Windows - accordingly creates maximize, minimize, close buttons
+Q appl is required for creation of any widget - widgets need system information that they get from Q appl
+Q Core - non GUI
+Q GUI - pure QML GUI
+Q Appl - qt + qml GUI
+Q Object has a Q Object list. it is a container. if there are children, list will be filled.
+
+day 6
+every Qt class must have a Q_OBJECT meta object. this helps to get meta information of the class.
+properties can be added to qt objects - through meta object system - static and dynamic - these properties are available outside qt c++
+qt c++ qobject's member variables cannot be accessed outside c++ i.e. in qml
+qt c++ qobject's properties, signals, slot, q_invokable methods, q_enums can be accessed outside c++ i.e. in qml
+qt c++ qobjects can be exposed to qml
+PROPERTY - NOTIFY signal is needed to be called whenever there's a change, for the qml exposed obj to get latest value
+do not emit NOTIFY signal if there's no change - it can have performance impact
+
+day 7
+qregistermetatype is to be done for new data types - eg. personal structures
+share only required image processing plugins - png or jpeg or other - helps reduce binary size
+
+day 8
+architecture
+	backend - qt, c++, c - exe
+	ui - qml - rcc
+	exclude qml from build - comment resource line in pro file
+	/Users/name/Qt5.14.0/5.14.0/clang_64/bin/rcc -compress 9 -threshold 0 -binary qml.qrc -o Carrier.rcc
+	register rcc in main.cpp
+ui thread must not do heavy operations - heavy tasks must be handled in different threads
+communication across threads is asynchronous
+signal is added to event list - thread when free processes the event - thus it is asynchronous
